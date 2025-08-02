@@ -1,0 +1,1 @@
+g++ src/game.cpp -o game -I./include -L./lib -lraylib -lGL -lX11 -lXrandr -lXi -lopenal
