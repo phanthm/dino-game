@@ -13,7 +13,7 @@ int main(void) {
 
         ClearBackground(RAYWHITE);
 
-        DrawText("DINO GAME", 190, 200, 20, LIGHTGRAY);
+        DrawText("DINO GAME", 190, 200, 80, LIGHTGRAY);
 
         EndDrawing();
     }
