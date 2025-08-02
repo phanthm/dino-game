@@ -1,6 +1,14 @@
 #include "raylib.h"
 #include "raymath.h"
 
+const int tile_size = 50;
+const int x_tiles = 24;
+const int y_tiles = 14;
+const int screen_width = tile_size * x_tiles;
+const int screen_height = tile_size * y_tiles;
+
+const int GROUND = 12;
+
 class Dino {
 private:
 int x, y;
@@ -9,8 +17,8 @@ Color color = BLACK;
 
 public:
 Dino(int x, int y, int width, int height) {
-    this->x = x;
-    this->y = y;
+    this->x = x * tile_size;
+    this->y = y * tile_size;
     this->width = width;
     this->height = height;
 }
@@ -22,12 +30,10 @@ void Draw() {
 };
 
 int main(void) {
-    const int screenWidth = 1920 * 0.75;
-    const int screenHeight = 1080 * 0.75;
 
-    Dino dino(10, 10, 10, 10);
+    Dino dino(0, 0, tile_size, tile_size);
 
-    InitWindow(screenWidth, screenHeight, "Dino Game!");
+    InitWindow(screen_width, screen_height, "Dino Game!");
 
     SetTargetFPS(60);
 
@@ -36,8 +42,6 @@ int main(void) {
 
         dino.Draw();
         ClearBackground(RAYWHITE);
-
-        DrawText("DINO GAME", 190, 200, 80, LIGHTGRAY);
 
         EndDrawing();
     }
