@@ -1,57 +1,76 @@
 #include "raylib.h"
 #include "raymath.h"
-#include <iostream>
+#include "stdio.h"
 
-const int tile_size = 50;
-const int x_tiles = 24;
-const int y_tiles = 14;
-const int screen_width = tile_size * x_tiles;
-const int screen_height = tile_size * y_tiles;
+const int TILE_SIZE = 50;
+const int X_TILES = 24;
+const int Y_TILES = 14;
+const int SCREEN_WIDTH = TILE_SIZE * X_TILES;
+const int SCREEN_HEIGHT = TILE_SIZE * Y_TILES;
 
-const int GROUND = 12;
+const int GRAVITY = 10;
+const int GROUND = TILE_SIZE * 11;
+const int JUMP_VELOCITY = -6;
 
 class Dino {
 private:
-    int x, y;
+    Vector2 position;
+    Vector2 velocity;
     int width, height;
     Color color = BLACK;
 
 public:
-    Dino(int x, int y, int width, int height) {
-        this->x = x * tile_size;
-        this->y = y * tile_size;
+    Dino(Vector2 position, Vector2 velocity, int width, int height) {
+        this->position = position;
+        this->velocity = velocity;
         this->width = width;
         this->height = height;
     }
 
     void Draw() {
-        DrawRectangle(x, y, width, height, color);
+        DrawRectangle(position.x, position.y, width, height, color);
+    }
+
+    void Update(float dt) {
+        position.x += velocity.x;
+        position.y += velocity.y;
+
+        if (position.y >= GROUND - height) {
+            velocity.y = 0;
+            position.y = GROUND - height;
+        } else {
+            velocity.y += GRAVITY * dt;
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            Jump();
+        }
     }
 
     void Jump() {
-        
-        std::cout << "space pressed" << std::endl;
+        velocity.y = JUMP_VELOCITY;
+        printf("space pressed");
 
     }
 
-    
+
 };
 
 int main(void) {
 
-    Dino dino = Dino(0, 0, tile_size, tile_size);
+    Dino dino = Dino({3 * TILE_SIZE, GROUND - TILE_SIZE}, {0, 0}, TILE_SIZE, TILE_SIZE);
 
-    InitWindow(screen_width, screen_height, "Dino Game!");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Dino Game!");
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
-        BeginDrawing();
+        float dt = GetFrameTime();
+        dino.Update(dt);
 
+        BeginDrawing();
         dino.Draw();
-        if (IsKeyPressed(KEY_SPACE)) {
-            dino.Jump();
-        }
+        DrawLine(0, GROUND, SCREEN_WIDTH, GROUND, BLACK);
         ClearBackground(RAYWHITE);
 
         EndDrawing();
