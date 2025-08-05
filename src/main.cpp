@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "raymath.h"
+#include <iostream>
 
 const int tile_size = 50;
 const int x_tiles = 24;
@@ -11,27 +12,34 @@ const int GROUND = 12;
 
 class Dino {
 private:
-int x, y;
-int width, height;
-Color color = BLACK;
+    int x, y;
+    int width, height;
+    Color color = BLACK;
 
 public:
-Dino(int x, int y, int width, int height) {
-    this->x = x * tile_size;
-    this->y = y * tile_size;
-    this->width = width;
-    this->height = height;
-}
+    Dino(int x, int y, int width, int height) {
+        this->x = x * tile_size;
+        this->y = y * tile_size;
+        this->width = width;
+        this->height = height;
+    }
 
-void Draw() {
-    DrawRectangle(x, y, width, height, color);
-}
+    void Draw() {
+        DrawRectangle(x, y, width, height, color);
+    }
 
+    void Jump() {
+        
+        std::cout << "space pressed" << std::endl;
+
+    }
+
+    
 };
 
 int main(void) {
 
-    Dino dino(0, 0, tile_size, tile_size);
+    Dino dino = Dino(0, 0, tile_size, tile_size);
 
     InitWindow(screen_width, screen_height, "Dino Game!");
 
@@ -41,6 +49,9 @@ int main(void) {
         BeginDrawing();
 
         dino.Draw();
+        if (IsKeyPressed(KEY_SPACE)) {
+            dino.Jump();
+        }
         ClearBackground(RAYWHITE);
 
         EndDrawing();
