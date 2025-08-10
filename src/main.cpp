@@ -8,23 +8,27 @@ const int Y_TILES = 14;
 const int SCREEN_WIDTH = TILE_SIZE * X_TILES;
 const int SCREEN_HEIGHT = TILE_SIZE * Y_TILES;
 
-const int GRAVITY = 10;
+const int GRAVITY = 1200;
 const int GROUND = TILE_SIZE * 11;
-const int JUMP_VELOCITY = -6;
+const int JUMP_VELOCITY = -600;
+const int CACTUS_SPEED = -600;
 
 class Dino {
 private:
     Vector2 position;
     Vector2 velocity;
     int width, height;
-    Color color = BLACK;
+    Color color;
+    bool inJump;
 
 public:
-    Dino(Vector2 position, Vector2 velocity, int width, int height) {
-        this->position = position;
-        this->velocity = velocity;
-        this->width = width;
-        this->height = height;
+    Dino() {
+        position = {3 * TILE_SIZE, GROUND - TILE_SIZE};
+        velocity = {0, 0};
+        width = TILE_SIZE;
+        height = TILE_SIZE;
+        inJump = false;
+        color = BLACK;
     }
 
     void Draw() {
@@ -32,33 +36,64 @@ public:
     }
 
     void Update(float dt) {
-        position.x += velocity.x;
-        position.y += velocity.y;
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
 
         if (position.y >= GROUND - height) {
+            inJump = false;
             velocity.y = 0;
             position.y = GROUND - height;
         } else {
             velocity.y += GRAVITY * dt;
         }
 
-        if (IsKeyPressed(KEY_SPACE)) {
+        if (IsKeyPressed(KEY_SPACE) && !inJump) {
             Jump();
+            inJump = true;
         }
     }
 
     void Jump() {
         velocity.y = JUMP_VELOCITY;
-        printf("space pressed");
-
     }
 
 
 };
 
+class Cactus {
+private:
+    Vector2 position;
+    Vector2 velocity;
+    int width, height;
+    Color color;
+
+public:
+    Cactus() {
+        position = {SCREEN_WIDTH + TILE_SIZE, GROUND - TILE_SIZE};
+        velocity = {CACTUS_SPEED, 0};
+        width = TILE_SIZE;
+        height = TILE_SIZE;
+        color = RED;
+    }
+
+    void Draw() {
+        DrawRectangle(position.x, position.y, width, height, color);
+    }
+
+    void Update(float dt) {
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
+
+        if (position.x <= -TILE_SIZE) {
+            position.x = SCREEN_WIDTH + TILE_SIZE;
+        }
+    }
+};
+
 int main(void) {
 
-    Dino dino = Dino({3 * TILE_SIZE, GROUND - TILE_SIZE}, {0, 0}, TILE_SIZE, TILE_SIZE);
+    Dino dino = Dino();
+    Cactus cactus = Cactus();
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Dino Game!");
 
@@ -67,9 +102,11 @@ int main(void) {
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         dino.Update(dt);
+        cactus.Update(dt);
 
         BeginDrawing();
         dino.Draw();
+        cactus.Draw();
         DrawLine(0, GROUND, SCREEN_WIDTH, GROUND, BLACK);
         ClearBackground(RAYWHITE);
 
