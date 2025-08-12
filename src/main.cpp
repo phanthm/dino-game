@@ -57,6 +57,10 @@ public:
         velocity.y = JUMP_VELOCITY;
     }
 
+    Rectangle GetRect() {
+        return {position.x, position.y, (float)width, (float)height};
+    }
+
 
 };
 
@@ -90,6 +94,10 @@ public:
             position.x = SCREEN_WIDTH + GetRandomValue(1, X_TILES) * TILE_SIZE;
         }
     }
+
+    Rectangle GetRect() {
+        return {position.x, position.y, (float)width, (float)height};
+    }
 };
 
 int main(void) {
@@ -101,21 +109,36 @@ int main(void) {
 
     SetTargetFPS(60);
 
+    bool gameOver = false;
+
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
-        dino.Update(dt);
-        cactus.Update(dt);
-        score += 1;
+
+        if (!gameOver) {
+            dino.Update(dt);
+            cactus.Update(dt);
+            score += 1;
+
+            if (CheckCollisionRecs(dino.GetRect(), cactus.GetRect())) {
+                gameOver = true;
+            }
+        }
 
         BeginDrawing();
+
+        ClearBackground(RAYWHITE);
 
         dino.Draw();
         cactus.Draw();
 
-        DrawText(TextFormat("%i", score), TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE - 30, 40, GRAY);
-        DrawLine(0, GROUND, SCREEN_WIDTH, GROUND, BLACK);
+        if (gameOver) {
+            DrawText("GAME OVER!", SCREEN_WIDTH / 2 - MeasureText("GAME OVER!", 80) / 2, SCREEN_HEIGHT / 2 - 40, 80, RED);
+        }
 
-        ClearBackground(RAYWHITE);
+        DrawText(TextFormat("%i", score), TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE - 30, 40, GRAY);
+
+
+        DrawLine(0, GROUND, SCREEN_WIDTH, GROUND, BLACK);
 
         EndDrawing();
     }
