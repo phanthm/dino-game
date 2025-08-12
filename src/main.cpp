@@ -1,6 +1,4 @@
 #include "raylib.h"
-#include "raymath.h"
-#include "stdio.h"
 
 const int TILE_SIZE = 50;
 const int X_TILES = 24;
@@ -8,10 +6,12 @@ const int Y_TILES = 14;
 const int SCREEN_WIDTH = TILE_SIZE * X_TILES;
 const int SCREEN_HEIGHT = TILE_SIZE * Y_TILES;
 
-const int GRAVITY = 1200;
+const int GRAVITY = 2000;
 const int GROUND = TILE_SIZE * 11;
-const int JUMP_VELOCITY = -600;
-const int CACTUS_SPEED = -600;
+const int JUMP_VELOCITY = -700;
+const int BASE_CACTUS_SPEED = -400;
+
+int score = 0;
 
 class Dino {
 private:
@@ -69,8 +69,8 @@ private:
 
 public:
     Cactus() {
-        position = {SCREEN_WIDTH + TILE_SIZE, GROUND - TILE_SIZE};
-        velocity = {CACTUS_SPEED, 0};
+        position = {1.5 * SCREEN_WIDTH, GROUND - TILE_SIZE};
+        velocity = {BASE_CACTUS_SPEED, 0};
         width = TILE_SIZE;
         height = TILE_SIZE;
         color = RED;
@@ -84,8 +84,10 @@ public:
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
 
+        velocity.x -= 0.0005 * GetTime();
+
         if (position.x <= -TILE_SIZE) {
-            position.x = SCREEN_WIDTH + TILE_SIZE;
+            position.x = SCREEN_WIDTH + GetRandomValue(1, X_TILES) * TILE_SIZE;
         }
     }
 };
@@ -103,11 +105,16 @@ int main(void) {
         float dt = GetFrameTime();
         dino.Update(dt);
         cactus.Update(dt);
+        score += 1;
 
         BeginDrawing();
+
         dino.Draw();
         cactus.Draw();
+
+        DrawText(TextFormat("%i", score), TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE - 30, 40, GRAY);
         DrawLine(0, GROUND, SCREEN_WIDTH, GROUND, BLACK);
+
         ClearBackground(RAYWHITE);
 
         EndDrawing();
