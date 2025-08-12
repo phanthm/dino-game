@@ -13,7 +13,7 @@ const int BASE_CACTUS_SPEED = -400;
 
 int score = 0;
 
-class Dino {
+class Player {
 private:
     Vector2 position;
     Vector2 velocity;
@@ -22,7 +22,7 @@ private:
     bool inJump;
 
 public:
-    Dino() {
+    Player() {
         position = {3 * TILE_SIZE, GROUND - TILE_SIZE};
         velocity = {0, 0};
         width = TILE_SIZE;
@@ -61,10 +61,14 @@ public:
         return {position.x, position.y, (float)width, (float)height};
     }
 
+    void SetValuesToBase() {
+        inJump = false;
+    }
+
 
 };
 
-class Cactus {
+class Obstacle {
 private:
     Vector2 position;
     Vector2 velocity;
@@ -72,7 +76,7 @@ private:
     Color color;
 
 public:
-    Cactus() {
+    Obstacle() {
         position = {1.5 * SCREEN_WIDTH, GROUND - TILE_SIZE};
         velocity = {BASE_CACTUS_SPEED, 0};
         width = TILE_SIZE;
@@ -98,12 +102,17 @@ public:
     Rectangle GetRect() {
         return {position.x, position.y, (float)width, (float)height};
     }
+
+    void SetValuesToBase() {
+        position = {1.5 * SCREEN_WIDTH, GROUND - TILE_SIZE};
+        velocity = {BASE_CACTUS_SPEED, 0};
+    }
 };
 
 int main(void) {
 
-    Dino dino = Dino();
-    Cactus cactus = Cactus();
+    Player player = Player();
+    Obstacle obstacle = Obstacle();
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Dino Game!");
 
@@ -115,11 +124,11 @@ int main(void) {
         float dt = GetFrameTime();
 
         if (!gameOver) {
-            dino.Update(dt);
-            cactus.Update(dt);
+            player.Update(dt);
+            obstacle.Update(dt);
             score += 1;
 
-            if (CheckCollisionRecs(dino.GetRect(), cactus.GetRect())) {
+            if (CheckCollisionRecs(player.GetRect(), obstacle.GetRect())) {
                 gameOver = true;
             }
         }
@@ -128,15 +137,22 @@ int main(void) {
 
         ClearBackground(RAYWHITE);
 
-        dino.Draw();
-        cactus.Draw();
+        player.Draw();
+        obstacle.Draw();
 
         if (gameOver) {
-            DrawText("GAME OVER!", SCREEN_WIDTH / 2 - MeasureText("GAME OVER!", 80) / 2, SCREEN_HEIGHT / 2 - 40, 80, RED);
+            DrawText("GAME OVER!", SCREEN_WIDTH / 2 - MeasureText("GAME OVER!", 80) / 2, SCREEN_HEIGHT / 2 - 80, 80, RED);
+            DrawText("PRESS SPACE", SCREEN_WIDTH / 2 - MeasureText("PRESS SPACE", 40) / 2, SCREEN_HEIGHT / 2 , 40, RED);
+
+            if (IsKeyPressed(KEY_SPACE)) {
+                player.SetValuesToBase();
+                obstacle.SetValuesToBase();
+                score = 0;
+                gameOver = false;
+            }
         }
 
         DrawText(TextFormat("%i", score), TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE - 30, 40, GRAY);
-
 
         DrawLine(0, GROUND, SCREEN_WIDTH, GROUND, BLACK);
 
